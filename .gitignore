@@ -1,3 +1,8 @@
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
 /Win32
 /x64
 /vulkan/Win32
