@@ -42,7 +42,9 @@ namespace vulkan_level_10 {
 	template <typename T> double ptr_to_double(T ptr) { return static_cast<double>(reinterpret_cast<int64_t>(ptr)); }
 	template <typename T> T double_to_ptr(double dbl) { return reinterpret_cast<T>(static_cast<int64_t>(dbl)); }
 
-#define setKeyValue(dst, key, val) { dst->Set(String::NewFromTwoByte(isolate, reinterpret_cast<const uint16_t *>(TEXT(key))), val); };
+#define lit2b(lit) String::NewFromTwoByte(isolate, reinterpret_cast<const uint16_t *>(TEXT(#lit)))
+#define str2b(str) String::NewFromTwoByte(isolate, reinterpret_cast<const uint16_t *>(TEXT(str)))
+#define setKeyValue(dst, key, val) { dst->Set(str2b(key), val); };
 #define setKeyInt32(dst, key, val) { setKeyValue(dst, key, Int32::New(isolate, val)); };
 #define setKeyUint32(dst, key, val) { setKeyValue(dst, key, Uint32::New(isolate, val)); };
 #define setKeyPtr(dst, key, val) { setKeyValue(dst, key, Number::New(isolate, ptr_to_double(val))); };
@@ -61,6 +63,13 @@ namespace vulkan_level_10 {
 		printf("instance: %I64u (0x%I64x)\n", (int64_t)pInstance, (int64_t)pInstance);
 		setKeyPtr(ret, "instance", pInstance);
 		args.GetReturnValue().Set(ret);
+		return;
+	}
+
+	
+	void wrap_vkDestroyDevice(const FunctionCallbackInfo<Value>& args) {
+		VkDevice device{ double_to_ptr<VkDevice>(args[0]->NumberValue()) };
+		vkDestroyDevice(device, nullptr);
 		return;
 	}
 
@@ -127,18 +136,31 @@ namespace vulkan_level_10 {
 		args.GetReturnValue().Set(aQueueFamilyProperties);
 	}
 
+	std::vector<float_t> getArgAsVectorOfFloats(const Local<Array>& arr) {
+		std::vector<float_t> ret;
+		const uint32_t len = arr->Length();
+		ret.resize(len);
+		for (uint32_t index{ 0 }; index < len; index++) {
+			ret[index] = static_cast<float_t>(arr->Get(index)->NumberValue());
+		}
+		return ret;
+	}
+
 	void wrap_vkCreateDevice(const FunctionCallbackInfo<Value>& args) {
-		//FIXME
 		Isolate* isolate = args.GetIsolate();
+		
+		std::vector<float_t> pQueuePriorities = getArgAsVectorOfFloats(Local<Array>::Cast(args[1]->ToObject()->Get(lit2b(queuePriorities))));
 		std::array<VkDeviceQueueCreateInfo, 1> queueCreateInfo{
 			{
 				VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO,
 				nullptr,
 				0,
-				VkDeviceQueueCreateFlags{},
-
+				args[1]->ToObject()->Get(lit2b(queueFamilyIndex))->Uint32Value(),
+				args[1]->ToObject()->Get(lit2b(queueCount))->Uint32Value(),
+				pQueuePriorities.data()
 			}
 		};
+
 		VkPhysicalDeviceFeatures deviceFeatures{ 0 };
 		VkDeviceCreateInfo info{
 			VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO,
@@ -151,6 +173,47 @@ namespace vulkan_level_10 {
 			0,
 			nullptr,
 			&deviceFeatures};
+
+		VkPhysicalDevice physicalDevice{ double_to_ptr<VkPhysicalDevice>(args[0]->NumberValue()) };
+
+		VkDevice device{ nullptr };
+		const auto status = vkCreateDevice(physicalDevice, &info, nullptr, &device);
+
+		Local<Object> ret{ Object::New(isolate) };
+		setKeyInt32(ret, "status", status);
+		printf("device: %I64u (0x%I64x)\n", (int64_t)device, (int64_t)device);
+		setKeyPtr(ret, "device", device);
+		args.GetReturnValue().Set(ret);
+	}
+
+	void wrap_vkGetDeviceQueue(const FunctionCallbackInfo<Value>& args) {
+		Isolate* isolate = args.GetIsolate();
+
+		VkDevice device{ double_to_ptr<VkDevice>(args[0]->NumberValue()) };
+		uint32_t queueFamilyIndex{ args[1]->Uint32Value() };
+		uint32_t queueIndex{ args[2]->Uint32Value() };
+		VkQueue pQueue{ nullptr };
+
+		vkGetDeviceQueue(device, queueFamilyIndex, queueIndex, &pQueue);
+
+		printf("queue: %I64u (0x%I64x)\n", (int64_t)pQueue, (int64_t)pQueue);
+		
+		args.GetReturnValue().Set(ptr_to_double(pQueue));
+	}
+
+	
+	void wrap_vkDeviceWaitIdle(const FunctionCallbackInfo<Value>& args) {
+		VkDevice device{ double_to_ptr<VkDevice>(args[0]->NumberValue()) };
+		const auto status = vkDeviceWaitIdle(device);
+
+		args.GetReturnValue().Set(status);
+	}
+
+	void wrap_vkQueueWaitIdle(const FunctionCallbackInfo<Value>& args) {
+		VkQueue queue{ double_to_ptr<VkQueue>(args[0]->NumberValue()) };
+		const auto status = vkQueueWaitIdle(queue);
+
+		args.GetReturnValue().Set(status);
 	}
 
 	void Init(Local<Object> exports) {
@@ -158,6 +221,11 @@ namespace vulkan_level_10 {
 		NODE_SET_METHOD(exports, "vkDestroyInstance", wrap_vkDestroyInstance);
 		NODE_SET_METHOD(exports, "vkEnumeratePhysicalDevices", wrap_vkEnumeratePhysicalDevices);
 		NODE_SET_METHOD(exports, "vkGetPhysicalDeviceQueueFamilyProperties", wrap_vkGetPhysicalDeviceQueueFamilyProperties);
-	//NODE_SET_METHOD(exports, "vkCreateDevice", wrap_vkCreateDevice); //FIXME
+		NODE_SET_METHOD(exports, "vkCreateDevice", wrap_vkCreateDevice);
+		NODE_SET_METHOD(exports, "vkDestroyDevice", wrap_vkDestroyDevice);
+		NODE_SET_METHOD(exports, "vkGetDeviceQueue", wrap_vkGetDeviceQueue);
+		NODE_SET_METHOD(exports, "vkDeviceWaitIdle", wrap_vkDeviceWaitIdle);
+		NODE_SET_METHOD(exports, "vkQueueWaitIdle", wrap_vkQueueWaitIdle);
+		
 	}
 }

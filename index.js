@@ -15,7 +15,36 @@
 		return vulkan_level_10.vkGetPhysicalDeviceQueueFamilyProperties(v);
 	});
 
-	console.log('queueFamilyProperties', queueFamilyProperties);
+	console.log('queueFamilyProperties');
+	console.log(JSON.stringify(queueFamilyProperties, null, 2));
+
+	const queueCreateInfo = {
+		queueFamilyIndex: 0,
+		queueCount: queueFamilyProperties[0][0].queueCount,
+		queuePriorities: Array(queueFamilyProperties[0][0].queueCount).fill(0)
+	};
+
+	console.log('queueCreateInfo');
+	console.log(JSON.stringify(queueCreateInfo, null, 2));
+	
+	const device = vulkan_level_10.vkCreateDevice(physicalDevices.physicalDevices[0], queueCreateInfo);
+	console.log('device', device);
+
+	const queue = vulkan_level_10.vkGetDeviceQueue(device.device, 0, 0);
+	console.log('queue', queue);
+
+	
+	{
+		const deviceWaitStatus = vulkan_level_10.vkDeviceWaitIdle(device.device);
+		console.log('deviceWaitStatus', deviceWaitStatus);
+	}
+
+	{
+		const queueWaitStatus = vulkan_level_10.vkQueueWaitIdle(queue);
+		console.log('queueWaitStatus', queueWaitStatus);
+	}
+
+	vulkan_level_10.vkDestroyDevice(device.device);
 
 	vulkan_level_10.vkDestroyInstance(createInstanceResult.instance);
 }
