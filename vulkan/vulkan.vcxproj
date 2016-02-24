@@ -70,27 +70,27 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <TargetExt>.node</TargetExt>
-    <IncludePath>C:\nodes\$(Platform)-$(Configuration)\node-v5.6.0\src;C:\nodes\$(Platform)-$(Configuration)\node-v5.6.0\deps\v8\include;C:\nodes\$(Platform)-$(Configuration)\node-v5.6.0\deps\uv\include;$(IncludePath)</IncludePath>
+    <IncludePath>C:\nodes\$(Platform)-$(Configuration)\node-v5.6.0\src;C:\nodes\$(Platform)-$(Configuration)\node-v5.6.0\deps\v8\include;C:\nodes\$(Platform)-$(Configuration)\node-v5.6.0\deps\uv\include;$(SolutionDir)include;$(IncludePath)</IncludePath>
     <LibraryPath>C:\nodes\$(Platform)-$(Configuration)\node-v5.6.0\$(Configuration)\lib;C:\nodes\$(Platform)-$(Configuration)\node-v5.6.0\$(Configuration);$(LibraryPath)</LibraryPath>
     <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
     <IntDir>$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <TargetExt>.node</TargetExt>
-    <IncludePath>C:\nodes\$(Platform)-$(Configuration)\node-v5.6.0\src;C:\nodes\$(Platform)-$(Configuration)\node-v5.6.0\deps\v8\include;C:\nodes\$(Platform)-$(Configuration)\node-v5.6.0\deps\uv\include;$(IncludePath)</IncludePath>
+    <IncludePath>C:\nodes\$(Platform)-$(Configuration)\node-v5.6.0\src;C:\nodes\$(Platform)-$(Configuration)\node-v5.6.0\deps\v8\include;C:\nodes\$(Platform)-$(Configuration)\node-v5.6.0\deps\uv\include;$(SolutionDir)include;$(IncludePath)</IncludePath>
     <LibraryPath>C:\nodes\$(Platform)-$(Configuration)\node-v5.6.0\$(Configuration)\lib;C:\nodes\$(Platform)-$(Configuration)\node-v5.6.0\$(Configuration);$(LibraryPath)</LibraryPath>
     <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
     <IntDir>$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <TargetExt>.node</TargetExt>
-    <IncludePath>C:\nodes\$(Platform)-$(Configuration)\node-v5.6.0\src;C:\nodes\$(Platform)-$(Configuration)\node-v5.6.0\deps\v8\include;C:\nodes\$(Platform)-$(Configuration)\node-v5.6.0\deps\uv\include;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\nodes\$(Platform)-$(Configuration)\node-v5.6.0\$(Configuration)\lib;C:\nodes\$(Platform)-$(Configuration)\node-v5.6.0\$(Configuration);$(LibraryPath)</LibraryPath>
+    <IncludePath>C:\nodes\$(Platform)-$(Configuration)\node-v5.6.0\src;C:\nodes\$(Platform)-$(Configuration)\node-v5.6.0\deps\v8\include;C:\nodes\$(Platform)-$(Configuration)\node-v5.6.0\deps\uv\include;$(SolutionDir)include;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\VulkanSDK\1.0.3.1\Source\lib;C:\nodes\$(Platform)-$(Configuration)\node-v5.6.0\$(Configuration)\lib;C:\nodes\$(Platform)-$(Configuration)\node-v5.6.0\$(Configuration);$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <TargetExt>.node</TargetExt>
-    <IncludePath>C:\nodes\$(Platform)-$(Configuration)\node-v5.6.0\src;C:\nodes\$(Platform)-$(Configuration)\node-v5.6.0\deps\v8\include;C:\nodes\$(Platform)-$(Configuration)\node-v5.6.0\deps\uv\include;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\nodes\$(Platform)-$(Configuration)\node-v5.6.0\$(Configuration)\lib;C:\nodes\$(Platform)-$(Configuration)\node-v5.6.0\$(Configuration);$(LibraryPath)</LibraryPath>
+    <IncludePath>C:\nodes\$(Platform)-$(Configuration)\node-v5.6.0\src;C:\nodes\$(Platform)-$(Configuration)\node-v5.6.0\deps\v8\include;C:\nodes\$(Platform)-$(Configuration)\node-v5.6.0\deps\uv\include;$(SolutionDir)include;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\VulkanSDK\1.0.3.1\Bin;C:\nodes\$(Platform)-$(Configuration)\node-v5.6.0\$(Configuration)\lib;C:\nodes\$(Platform)-$(Configuration)\node-v5.6.0\$(Configuration);$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -139,6 +139,9 @@
   <ItemGroup>
     <ClCompile Include="dllmain.cpp" />
     <ClCompile Include="vulkan_level_10.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="vulkan_level_10.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
