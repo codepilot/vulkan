@@ -1,13 +1,12 @@
-#include <node.h>
+#pragma comment(lib, "node.lib")
+#pragma comment (lib,"vulkan-1.lib")
 
-#include <SDKDDKVer.h>
-#define WIN32_LEAN_AND_MEAN
-#include <windows.h>
 
-#include "vulkan_level_10.h"
-#include "vulkan_level_20.h"
+//#include "vulkanDll.h"
+#include "vulkan_levels.h"
 
 namespace {
+
 	using v8::Object;
 	using v8::Isolate;
 	using v8::HandleScope;
@@ -47,6 +46,7 @@ namespace {
 		setKeyValue(exports, "level_20", level_20);
 		vulkan_level_10::Init(level_10);
 		vulkan_level_20::Init(level_20);
+	//VulkanDll::Init(exports);
 	}
 	NODE_MODULE(addon, Init)
 }

@@ -1,5 +1,22 @@
 #pragma once
 
+#include <stdexcept>
+#include <vector>
+#include <array>
+#include <safeint.h>
+#include <node.h>
+#include <node_buffer.h>
+#include <node_object_wrap.h>
+#include <uv.h>
+#include <fcntl.h>
+
+#include <SDKDDKVer.h>
+#define WIN32_LEAN_AND_MEAN
+//#include <windows.h>
+
+#define VK_USE_PLATFORM_WIN32_KHR 1
+#include <vulkan/vulkan.h>
+
 using v8::Int32;
 using v8::Uint32;
 using v8::HandleScope;
@@ -31,3 +48,7 @@ template <typename T> T double_to_ptr(double dbl) { return reinterpret_cast<T>(s
 
 #define setIndexValue(dst, key, val) { dst->Set(index, val); };
 #define setIndexPtr(dst, index, val) { setIndexValue(dst, key, Number::New(isolate, ptr_to_double(val))); };
+
+
+#include "vulkan_level_10.h"
+#include "vulkan_level_20.h"

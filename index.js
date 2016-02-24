@@ -1,5 +1,22 @@
 "use strict";
 
+if (false) {
+	//don't really want to dynamically load the dll, static is better for now
+	const vulkanNode = require(process.argv[2]);
+	console.log('vulkanNode', vulkanNode);
+
+	{
+		const VulkanDll = new vulkanNode.VulkanDll('C:\\VulkanSDK\\1.0.3.1\\Demos\\x64\\Debug\\vulkan-1.dll');
+	//const VulkanDll = new vulkanNode.VulkanDll('C:\\VulkanSDK\\1.0.3.1\\Source\\lib\\vulkan-1.dll');//no good
+		console.log('VulkanDll', VulkanDll);
+	}
+
+	{
+		const VulkanDll = new vulkanNode.VulkanDll();
+		console.log('VulkanDll', VulkanDll);
+	}
+}
+
 if(false) {
 	const vulkan_level_10 = require(process.argv[2]).level_10;
 	console.log('vulkan_level_10', vulkan_level_10);
@@ -52,10 +69,13 @@ if(false) {
 if (true) {
 	const vulkan_level_20 = require(process.argv[2]).level_20;
 	console.log('vulkan_level_20', vulkan_level_20);
+
 	const instance = new vulkan_level_20.Instance();
 	console.log('instance', instance);
 	instance.enumeratePhysicalDevices().forEach(function (v, i, a) {
 		console.log('physicalDevice[' + i + ']', v);
-		console.log(v.getQueueFamilyProperties());
+		console.log('v.getQueueFamilyProperties()', v.getQueueFamilyProperties());
+		console.log('v.getWin32PresentationSupportKHR()', v.getWin32PresentationSupportKHR());
+		console.log('v.getMemoryProperties()', v.getMemoryProperties());
 	});
 }

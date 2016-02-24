@@ -1,25 +1,6 @@
-#include <stdexcept>
-#include <vector>
-#include <array>
-#include <safeint.h>
-#include <node.h>
-#include <node_buffer.h>
-#include <node_object_wrap.h>
-#include <uv.h>
-#include <fcntl.h>
-
-#include <SDKDDKVer.h>
-#define WIN32_LEAN_AND_MEAN
-//#include <windows.h>
-
-#define VK_USE_PLATFORM_WIN32_KHR 1
-#include <vulkan/vulkan.h>
-
-#pragma comment(lib, "node.lib")
-#pragma comment (lib,"vulkan-1.lib")
+#include "vulkan_levels.h"
 
 namespace vulkan_level_10 {
-	#include "vulkan_levels.h"
 
 	void wrap_vkCreateInstance(const FunctionCallbackInfo<Value>& args) {
 		Isolate* isolate = args.GetIsolate();
