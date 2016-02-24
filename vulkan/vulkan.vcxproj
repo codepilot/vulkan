@@ -141,7 +141,9 @@
     <ClCompile Include="vulkan_level_10.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="vulkan_levels.h" />
     <ClInclude Include="vulkan_level_10.h" />
+    <ClInclude Include="vulkan_level_20.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -5,6 +5,7 @@
 #include <windows.h>
 
 #include "vulkan_level_10.h"
+#include "vulkan_level_20.h"
 
 namespace {
 	using v8::Object;
@@ -13,10 +14,6 @@ namespace {
 	using v8::Local;
 	using v8::String;
 	using node::AtExit;
-
-#define setKeyValue(dst, key, val) { dst->Set(String::NewFromTwoByte(isolate, reinterpret_cast<const uint16_t *>(TEXT(key))), val); };
-#define setKeyInt32(dst, key, val) { setKeyValue(dst, key, Int32::New(isolate, val)); };
-#define setKeyPtr(dst, key, val) { setKeyValue(dst, key, Number::New(isolate, ptr_to_double(val))); };
 
 	BOOL APIENTRY DllMain(HMODULE hModule, DWORD  ul_reason_for_call, LPVOID lpReserved) {
 		switch (ul_reason_for_call) {
@@ -45,8 +42,11 @@ namespace {
 		AtExit(AtExit_DebugCallback);
 	#endif
 		Local<Object> level_10{ Object::New(isolate) };
+		Local<Object> level_20{ Object::New(isolate) };
 		setKeyValue(exports, "level_10", level_10);
+		setKeyValue(exports, "level_20", level_20);
 		vulkan_level_10::Init(level_10);
+		vulkan_level_20::Init(level_20);
 	}
 	NODE_MODULE(addon, Init)
 }

@@ -1,6 +1,6 @@
 "use strict";
 
-{
+if(false) {
 	const vulkan_level_10 = require(process.argv[2]).level_10;
 	console.log('vulkan_level_10', vulkan_level_10);
 
@@ -47,4 +47,15 @@
 	vulkan_level_10.vkDestroyDevice(device.device);
 
 	vulkan_level_10.vkDestroyInstance(createInstanceResult.instance);
+}
+
+if (true) {
+	const vulkan_level_20 = require(process.argv[2]).level_20;
+	console.log('vulkan_level_20', vulkan_level_20);
+	const instance = new vulkan_level_20.Instance();
+	console.log('instance', instance);
+	instance.enumeratePhysicalDevices().forEach(function (v, i, a) {
+		console.log('physicalDevice[' + i + ']', v);
+		console.log(v.getQueueFamilyProperties());
+	});
 }

@@ -30,5 +30,11 @@
     <ClInclude Include="vulkan_level_10.h">
       <Filter>Source Files</Filter>
     </ClInclude>
+    <ClInclude Include="vulkan_level_20.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="vulkan_levels.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
