@@ -1,5 +1,5 @@
-/Debug
-/Release
-/vulkan/Debug
-/vulkan/Release
+/Win32
+/x64
+/vulkan/Win32
+/vulkan/x64
 /.vs/config

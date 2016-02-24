@@ -18,4 +18,12 @@
     <None Include="..\package.json" />
     <None Include="..\index.js" />
   </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="vulkan_level_10.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="dllmain.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
 </Project>
