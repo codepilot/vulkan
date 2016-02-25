@@ -71,32 +71,12 @@ namespace vulkan_level_20 {
 		printf("instance: %I64u (0x%I64x)\n", (int64_t)instance, (int64_t)instance);
 		setELitPtr(args.This(), instance, instance);
 
-		getProcAddr(vkCreateDebugReportCallbackEXT, "vkCreateDebugReportCallbackEXT");
-		getProcAddr(vkDestroyDebugReportCallbackEXT, "vkDestroyDebugReportCallbackEXT");
-		getProcAddr(vkDebugReportMessageEXT, "vkDebugReportMessageEXT");
+		{
+#define createPFN(funcName) {getProcAddr(funcName, #funcName); setELitPtr(args.This(), funcName, funcName); }
+#include "vulkan_pfn.h"
+#undef createPFN
+		}
 
-		setELitPtr(args.This(), vkCreateDebugReportCallbackEXT, vkCreateDebugReportCallbackEXT);
-		setELitPtr(args.This(), vkDestroyDebugReportCallbackEXT, vkDestroyDebugReportCallbackEXT);
-		setELitPtr(args.This(), vkDebugReportMessageEXT, vkDebugReportMessageEXT);
-		
-		getProcAddr(vkCreateWin32SurfaceKHR, "vkCreateWin32SurfaceKHR");
-		getProcAddr(vkGetPhysicalDeviceWin32PresentationSupportKHR, "vkGetPhysicalDeviceWin32PresentationSupportKHR");
-		setELitPtr(args.This(), vkCreateWin32SurfaceKHR, vkCreateWin32SurfaceKHR);
-		setELitPtr(args.This(), vkGetPhysicalDeviceWin32PresentationSupportKHR, vkGetPhysicalDeviceWin32PresentationSupportKHR);
-		
-		//VK_KHR_surface
-		
-
-		getProcAddr(vkDestroySurfaceKHR, "vkDestroySurfaceKHR");
-		getProcAddr(vkGetPhysicalDeviceSurfaceSupportKHR, "vkGetPhysicalDeviceSurfaceSupportKHR");
-		getProcAddr(vkGetPhysicalDeviceSurfaceCapabilitiesKHR, "vkGetPhysicalDeviceSurfaceCapabilitiesKHR");
-		getProcAddr(vkGetPhysicalDeviceSurfaceFormatsKHR, "vkGetPhysicalDeviceSurfaceFormatsKHR");
-		getProcAddr(vkGetPhysicalDeviceSurfacePresentModesKHR, "vkGetPhysicalDeviceSurfacePresentModesKHR");
-		setELitPtr(args.This(), vkDestroySurfaceKHR, vkDestroySurfaceKHR);
-		setELitPtr(args.This(), vkGetPhysicalDeviceSurfaceSupportKHR, vkGetPhysicalDeviceSurfaceSupportKHR);
-		setELitPtr(args.This(), vkGetPhysicalDeviceSurfaceCapabilitiesKHR, vkGetPhysicalDeviceSurfaceCapabilitiesKHR);
-		setELitPtr(args.This(), vkGetPhysicalDeviceSurfaceFormatsKHR, vkGetPhysicalDeviceSurfaceFormatsKHR);
-		setELitPtr(args.This(), vkGetPhysicalDeviceSurfacePresentModesKHR, vkGetPhysicalDeviceSurfacePresentModesKHR);
 		Wrap(args.This());
 
 		VkDebugReportCallbackEXT callback{ nullptr };
