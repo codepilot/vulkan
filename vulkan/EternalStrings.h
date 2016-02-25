@@ -1,4 +1,6 @@
 createELit(status);
+createELit(layers);
+createELit(extensions);
 createELit(device);
 createELit(instance);
 createELit(level_10);

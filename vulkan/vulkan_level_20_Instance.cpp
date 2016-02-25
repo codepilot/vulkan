@@ -34,36 +34,43 @@ namespace vulkan_level_20 {
 		args.GetReturnValue().Set(instance);
 	};
 
+	auto jsArray_to_string_array(const Local<Array> arr) {
+		std::tuple<std::vector<std::string>, std::vector<const char *>> ret;
+
+		const auto arrLength = arr->Length();
+		std::get<0>(ret).reserve(arrLength);
+		std::get<1>(ret).reserve(arrLength);
+
+		for (uint32_t index{ 0 }; index < arrLength; index++) {
+			String::Utf8Value valN{ arr->Get(index)->ToString() };
+			std::get<0>(ret).push_back(*valN);
+			std::get<1>(ret).push_back(std::get<0>(ret)[index].c_str());
+		}
+		return ret;
+	}
+
 	Instance::Instance(const FunctionCallbackInfo<Value>& args) {
 		Isolate* isolate = args.GetIsolate();
 		HandleScope handle_scope(isolate);
 
 		VkInstanceCreateInfo info{ VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO, nullptr, 0, nullptr, 0, nullptr, 0, nullptr };
 
-		std::vector<std::string> vsEnabledExtensionNames{ "VK_KHR_surface", "VK_KHR_win32_surface", "VK_EXT_debug_report" };
-		std::vector<std::string> vsEnabledLayerNames{
-			"VK_LAYER_GOOGLE_unique_objects",//	wrap all Vulkan objects in a unique pointer at create time and unwrap them at use time
-			"VK_LAYER_LUNARG_api_dump",//	print API calls and their parameters and values
-			"VK_LAYER_LUNARG_device_limits",//	validate that app properly queries features and obeys feature limitations
-			"VK_LAYER_LUNARG_draw_state",//	validate the descriptor set, pipeline state, and dynamic state; validate the interfaces between SPIR - V modules and the graphics pipeline
-			"VK_LAYER_LUNARG_image",//	validate texture formats and render target formats
-			"VK_LAYER_LUNARG_mem_tracker",//	track and validate GPU memory and its binding to objects and command buffers
-			"VK_LAYER_LUNARG_object_tracker",//	track all Vulkan objects and flag invalid objects and object memory leaks
-			"VK_LAYER_LUNARG_param_checker",//	validate API parameter values
-			"VK_LAYER_LUNARG_swapchain",//	validate the use of the WSI "swapchain" extensions
-			"VK_LAYER_LUNARG_threading"//	check validity of multi - threaded API usage
-		};
+		decltype(jsArray_to_string_array(get_args_n_Elit_as_Array(0, layers))) layers;
+		decltype(jsArray_to_string_array(get_args_n_Elit_as_Array(0, extensions))) extensions;
 
-		std::vector<const char *> vpEnabledExtensionNames{};
-		std::vector<const char *> vpEnabledLayerNames{};
-		for (const auto &nExt: vsEnabledExtensionNames) { vpEnabledExtensionNames.push_back(nExt.c_str()); }
-		for (const auto &nLayer: vsEnabledLayerNames) { vpEnabledLayerNames.push_back(nLayer.c_str()); }
+		if (args.Length() > 0 && args[0]->IsObject()) {
+			if (args[0]->ToObject()->HasOwnProperty(getEternalLit(layers))) {
+				layers = jsArray_to_string_array(get_args_n_Elit_as_Array(0, layers));
+				info.ppEnabledLayerNames = std::get<1>(layers).data();
+				info.enabledLayerCount = SafeInt<uint32_t>(std::get<1>(layers).size());
+			}
 
-		info.ppEnabledExtensionNames = vpEnabledExtensionNames.data();
-		info.ppEnabledLayerNames = vpEnabledLayerNames.data();
-
-		info.enabledExtensionCount = SafeInt<uint32_t>(vpEnabledExtensionNames.size());
-		info.enabledLayerCount = SafeInt<uint32_t>(vpEnabledLayerNames.size());
+			if (args[0]->ToObject()->HasOwnProperty(getEternalLit(extensions))) {
+				extensions = jsArray_to_string_array(get_args_n_Elit_as_Array(0, extensions));
+				info.ppEnabledExtensionNames = std::get<1>(extensions).data();
+				info.enabledExtensionCount = SafeInt<uint32_t>(std::get<1>(extensions).size());
+			}
+		}
 
 		const auto status = vkCreateInstance(&info, nullptr, &instance);
 		setELitInt32(args.This(), status, status);

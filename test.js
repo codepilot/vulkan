@@ -1,8 +1,34 @@
-console.log(new require("./build/Release/binding.node").level_20.Instance());
+"use strict";
+
+if (true) {
+	const vulkan_level_20 = require("./index.js").level_20;
+
+	const inst = new vulkan_level_20.Instance({
+		"layers": [
+			"VK_LAYER_GOOGLE_unique_objects",// wrap all Vulkan objects in a unique pointer at create time and unwrap them at use time
+			"VK_LAYER_LUNARG_api_dump",      // print API calls and their parameters and values
+			"VK_LAYER_LUNARG_device_limits", // validate that app properly queries features and obeys feature limitations
+			"VK_LAYER_LUNARG_draw_state",    // validate the descriptor set, pipeline state, and dynamic state; validate the interfaces between SPIR - V modules and the graphics pipeline
+			"VK_LAYER_LUNARG_image",         // validate texture formats and render target formats
+			"VK_LAYER_LUNARG_mem_tracker",   // track and validate GPU memory and its binding to objects and command buffers
+			"VK_LAYER_LUNARG_object_tracker",// track all Vulkan objects and flag invalid objects and object memory leaks
+			"VK_LAYER_LUNARG_param_checker", // validate API parameter values
+			"VK_LAYER_LUNARG_swapchain",     // validate the use of the WSI "swapchain" extensions
+			"VK_LAYER_LUNARG_threading"      // check validity of multi - threaded API usage
+		],
+		"extensions": [
+			"VK_KHR_surface",
+			"VK_KHR_win32_surface",
+			"VK_EXT_debug_report"
+		]
+	});
+	console.log(inst);
+}
+
 
 if (false) {
 	//don't really want to dynamically load the dll, static is better for now
-	const vulkanNode = require('./build/Release/binding.node');
+	const vulkanNode = require("./index.js");
 	console.log('vulkanNode', vulkanNode);
 
 	{
@@ -18,7 +44,7 @@ if (false) {
 }
 
 if (false) {
-	const vulkan_level_10 = require('./build/Release/binding.node').level_10;
+	const vulkan_level_10 = require("./index.js").level_10;
 	console.log('vulkan_level_10', vulkan_level_10);
 
 	const createInstanceResult = vulkan_level_10.vkCreateInstance();
@@ -67,7 +93,7 @@ if (false) {
 }
 
 if (false) {
-	const vulkan_level_20 = require('./build/Release/binding.node').level_20;
+	const vulkan_level_20 = require("./index.js").level_20;
 	console.log('vulkan_level_20', vulkan_level_20);
 
 	const instance = new vulkan_level_20.Instance();
