@@ -38,9 +38,10 @@ using msl::utilities::SafeInt;
 
 template <typename T> double ptr_to_double(T ptr) { return static_cast<double>(reinterpret_cast<int64_t>(ptr)); }
 template <typename T> T double_to_ptr(double dbl) { return reinterpret_cast<T>(static_cast<int64_t>(dbl)); }
+template <typename SrcType, typename DstType> DstType ptr_to_ptr(SrcType srcPtr) { return reinterpret_cast<DstType>(srcPtr); }
 
-#define lit2b(lit) String::NewFromTwoByte(isolate, reinterpret_cast<const uint16_t *>(TEXT(#lit)))
-#define str2b(str) String::NewFromTwoByte(isolate, reinterpret_cast<const uint16_t *>(TEXT(str)))
+#define lit2b(lit) String::NewFromTwoByte(isolate, ptr_to_ptr<const wchar_t *, const uint16_t *>(L#lit))
+#define str2b(str) String::NewFromTwoByte(isolate, ptr_to_ptr<const wchar_t *, const uint16_t *>(L##str))
 #define setKeyValue(dst, key, val) { dst->Set(str2b(key), val); };
 #define setKeyInt32(dst, key, val) { setKeyValue(dst, key, Int32::New(isolate, val)); };
 #define setKeyUint32(dst, key, val) { setKeyValue(dst, key, Uint32::New(isolate, val)); };

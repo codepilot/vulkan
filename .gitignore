@@ -3,6 +3,8 @@
 *.userosscache
 *.sln.docstates
 
+/build
+
 /Win32
 /x64
 /vulkan/Win32

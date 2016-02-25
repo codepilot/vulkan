@@ -1,7 +1,3 @@
-#pragma comment(lib, "node.lib")
-#pragma comment (lib,"vulkan-1.lib")
-
-
 //#include "vulkanDll.h"
 #include "vulkan_levels.h"
 
