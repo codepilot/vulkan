@@ -2,8 +2,6 @@
 
 namespace vulkan_level_20 {
 	Persistent<Function> Instance::constructor;
-	v8::Eternal<v8::String> es_status;
-	v8::Eternal<v8::String> es_instance;
 	
 
 	void Instance::Init(Isolate* isolate) {
@@ -21,9 +19,7 @@ namespace vulkan_level_20 {
 	//es_status.Set(isolate, String::NewFromTwoByte(isolate, ptr_to_ptr<const wchar_t *, const uint16_t *>(L"status"), v8::String::kInternalizedString));
 	//es_instance.Set(isolate, String::NewFromTwoByte(isolate, ptr_to_ptr<const wchar_t *, const uint16_t *>(L"instance"), v8::String::kInternalizedString));
 
-		setEternalLit(status);
-		setEternalLit(instance);
-		
+	
 		constructor.Reset(isolate, tpl->GetFunction());
 	}
 
@@ -79,14 +75,14 @@ namespace vulkan_level_20 {
 		getProcAddr(vkDestroyDebugReportCallbackEXT, "vkDestroyDebugReportCallbackEXT");
 		getProcAddr(vkDebugReportMessageEXT, "vkDebugReportMessageEXT");
 
-		setKeyPtr(args.This(), "vkCreateDebugReportCallbackEXT", vkCreateDebugReportCallbackEXT);
-		setKeyPtr(args.This(), "vkDestroyDebugReportCallbackEXT", vkDestroyDebugReportCallbackEXT);
-		setKeyPtr(args.This(), "vkDebugReportMessageEXT", vkDebugReportMessageEXT);
+		setELitPtr(args.This(), vkCreateDebugReportCallbackEXT, vkCreateDebugReportCallbackEXT);
+		setELitPtr(args.This(), vkDestroyDebugReportCallbackEXT, vkDestroyDebugReportCallbackEXT);
+		setELitPtr(args.This(), vkDebugReportMessageEXT, vkDebugReportMessageEXT);
 		
 		getProcAddr(vkCreateWin32SurfaceKHR, "vkCreateWin32SurfaceKHR");
 		getProcAddr(vkGetPhysicalDeviceWin32PresentationSupportKHR, "vkGetPhysicalDeviceWin32PresentationSupportKHR");
-		setKeyPtr(args.This(), "vkCreateWin32SurfaceKHR", vkCreateWin32SurfaceKHR);
-		setKeyPtr(args.This(), "vkGetPhysicalDeviceWin32PresentationSupportKHR", vkGetPhysicalDeviceWin32PresentationSupportKHR);
+		setELitPtr(args.This(), vkCreateWin32SurfaceKHR, vkCreateWin32SurfaceKHR);
+		setELitPtr(args.This(), vkGetPhysicalDeviceWin32PresentationSupportKHR, vkGetPhysicalDeviceWin32PresentationSupportKHR);
 		
 		//VK_KHR_surface
 		
@@ -96,11 +92,11 @@ namespace vulkan_level_20 {
 		getProcAddr(vkGetPhysicalDeviceSurfaceCapabilitiesKHR, "vkGetPhysicalDeviceSurfaceCapabilitiesKHR");
 		getProcAddr(vkGetPhysicalDeviceSurfaceFormatsKHR, "vkGetPhysicalDeviceSurfaceFormatsKHR");
 		getProcAddr(vkGetPhysicalDeviceSurfacePresentModesKHR, "vkGetPhysicalDeviceSurfacePresentModesKHR");
-		setKeyPtr(args.This(), "vkDestroySurfaceKHR", vkDestroySurfaceKHR);
-		setKeyPtr(args.This(), "vkGetPhysicalDeviceSurfaceSupportKHR", vkGetPhysicalDeviceSurfaceSupportKHR);
-		setKeyPtr(args.This(), "vkGetPhysicalDeviceSurfaceCapabilitiesKHR", vkGetPhysicalDeviceSurfaceCapabilitiesKHR);
-		setKeyPtr(args.This(), "vkGetPhysicalDeviceSurfaceFormatsKHR", vkGetPhysicalDeviceSurfaceFormatsKHR);
-		setKeyPtr(args.This(), "vkGetPhysicalDeviceSurfacePresentModesKHR", vkGetPhysicalDeviceSurfacePresentModesKHR);
+		setELitPtr(args.This(), vkDestroySurfaceKHR, vkDestroySurfaceKHR);
+		setELitPtr(args.This(), vkGetPhysicalDeviceSurfaceSupportKHR, vkGetPhysicalDeviceSurfaceSupportKHR);
+		setELitPtr(args.This(), vkGetPhysicalDeviceSurfaceCapabilitiesKHR, vkGetPhysicalDeviceSurfaceCapabilitiesKHR);
+		setELitPtr(args.This(), vkGetPhysicalDeviceSurfaceFormatsKHR, vkGetPhysicalDeviceSurfaceFormatsKHR);
+		setELitPtr(args.This(), vkGetPhysicalDeviceSurfacePresentModesKHR, vkGetPhysicalDeviceSurfacePresentModesKHR);
 		Wrap(args.This());
 
 		VkDebugReportCallbackEXT callback{ nullptr };

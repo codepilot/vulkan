@@ -9,9 +9,9 @@ namespace vulkan_level_10 {
 		VkInstance pInstance{ nullptr };
 		const auto status = vkCreateInstance(&info, nullptr, &pInstance);
 		Local<Object> ret{ Object::New(isolate) };
-		setKeyInt32(ret, "status", status);
+		setELitInt32(ret, status, status);
 		printf("instance: %I64u (0x%I64x)\n", (int64_t)pInstance, (int64_t)pInstance);
-		setKeyPtr(ret, "instance", pInstance);
+		setELitPtr(ret, instance, pInstance);
 		args.GetReturnValue().Set(ret);
 		return;
 	}
@@ -50,9 +50,9 @@ namespace vulkan_level_10 {
 		}
 
 		Local<Object> ret{ Object::New(isolate) };
-		setKeyInt32(ret, "status", status);
+		setELitInt32(ret, status, status);
 		printf("instance: %I64u (0x%I64x)\n", (int64_t)pInstance, (int64_t)pInstance);
-		setKeyValue(ret, "physicalDevices", aPhysicalDevices);
+		setELitValue(ret, physicalDevices, aPhysicalDevices);
 		args.GetReturnValue().Set(ret);
 	}
 
@@ -70,15 +70,15 @@ namespace vulkan_level_10 {
 		Local<Array> aQueueFamilyProperties{ Array::New(isolate, pQueueFamilyPropertyCount) };
 		for (int32_t index{ 0 }; index < SafeInt<int32_t>(pQueueFamilyPropertyCount); index++) {
 			Local<Object> nProps{ Object::New(isolate) };
-			setKeyUint32(nProps, "queueFlags", pQueueFamilyProperties[index].queueFlags);
-			setKeyUint32(nProps, "queueCount", pQueueFamilyProperties[index].queueCount);
-			setKeyUint32(nProps, "timestampValidBits", pQueueFamilyProperties[index].timestampValidBits);
+			setELitUint32(nProps, queueFlags, pQueueFamilyProperties[index].queueFlags);
+			setELitUint32(nProps, queueCount, pQueueFamilyProperties[index].queueCount);
+			setELitUint32(nProps, timestampValidBits, pQueueFamilyProperties[index].timestampValidBits);
 
 			Local<Object> minImageTransferGranularity{ Object::New(isolate) };
-			setKeyUint32(minImageTransferGranularity, "width", pQueueFamilyProperties[index].minImageTransferGranularity.width);
-			setKeyUint32(minImageTransferGranularity, "height", pQueueFamilyProperties[index].minImageTransferGranularity.height);
-			setKeyUint32(minImageTransferGranularity, "depth", pQueueFamilyProperties[index].minImageTransferGranularity.depth);
-			setKeyValue(nProps, "minImageTransferGranularity", minImageTransferGranularity);
+			setELitUint32(minImageTransferGranularity, width, pQueueFamilyProperties[index].minImageTransferGranularity.width);
+			setELitUint32(minImageTransferGranularity, height, pQueueFamilyProperties[index].minImageTransferGranularity.height);
+			setELitUint32(minImageTransferGranularity, depth, pQueueFamilyProperties[index].minImageTransferGranularity.depth);
+			setELitValue(nProps, minImageTransferGranularity, minImageTransferGranularity);
 
 			setIndexValue(aQueueFamilyProperties, index, nProps);
 		}
@@ -99,14 +99,14 @@ namespace vulkan_level_10 {
 	void wrap_vkCreateDevice(const FunctionCallbackInfo<Value>& args) {
 		Isolate* isolate = args.GetIsolate();
 		
-		std::vector<float_t> pQueuePriorities = getArgAsVectorOfFloats(Local<Array>::Cast(args[1]->ToObject()->Get(lit2b(queuePriorities))));
+		std::vector<float_t> pQueuePriorities = getArgAsVectorOfFloats(get_args_n_Elit_as_Array(1, queuePriorities));
 		std::array<VkDeviceQueueCreateInfo, 1> queueCreateInfo{
 			{
 				VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO,
 				nullptr,
 				0,
-				args[1]->ToObject()->Get(lit2b(queueFamilyIndex))->Uint32Value(),
-				args[1]->ToObject()->Get(lit2b(queueCount))->Uint32Value(),
+				get_args_n_Elit_as_Uint32(1, queueFamilyIndex),
+				get_args_n_Elit_as_Uint32(1, queueCount),
 				pQueuePriorities.data()
 			}
 		};
@@ -130,9 +130,9 @@ namespace vulkan_level_10 {
 		const auto status = vkCreateDevice(physicalDevice, &info, nullptr, &device);
 
 		Local<Object> ret{ Object::New(isolate) };
-		setKeyInt32(ret, "status", status);
+		setELitInt32(ret, status, status);
 		printf("device: %I64u (0x%I64x)\n", (int64_t)device, (int64_t)device);
-		setKeyPtr(ret, "device", device);
+		setELitPtr(ret, device, device);
 		args.GetReturnValue().Set(ret);
 	}
 

@@ -40,24 +40,37 @@ template <typename T> double ptr_to_double(T ptr) { return static_cast<double>(r
 template <typename T> T double_to_ptr(double dbl) { return reinterpret_cast<T>(static_cast<int64_t>(dbl)); }
 template <typename SrcType, typename DstType> DstType ptr_to_ptr(SrcType srcPtr) { return reinterpret_cast<DstType>(srcPtr); }
 
-#define lit2b(lit) String::NewFromTwoByte(isolate, ptr_to_ptr<const wchar_t *, const uint16_t *>(L#lit))
-#define str2b(str) String::NewFromTwoByte(isolate, ptr_to_ptr<const wchar_t *, const uint16_t *>(L##str))
-#define setKeyValue(dst, key, val) { dst->Set(str2b(key), val); };
-#define setKeyInt32(dst, key, val) { setKeyValue(dst, key, Int32::New(isolate, val)); };
-#define setKeyUint32(dst, key, val) { setKeyValue(dst, key, Uint32::New(isolate, val)); };
-#define setKeyPtr(dst, key, val) { setKeyValue(dst, key, Number::New(isolate, ptr_to_double(val))); };
+//#define lit2b(lit) String::NewFromTwoByte(isolate, ptr_to_ptr<const wchar_t *, const uint16_t *>(L#lit))
+//#define str2b(str) String::NewFromTwoByte(isolate, ptr_to_ptr<const wchar_t *, const uint16_t *>(L##str))
+//#define setKeyValue(dst, key, val) { dst->Set(str2b(key), val); };
+//#define setKeyInt32(dst, key, val) { setKeyValue(dst, key, Int32::New(isolate, val)); };
+//#define setKeyUint32(dst, key, val) { setKeyValue(dst, key, Uint32::New(isolate, val)); };
+//#define setKeyPtr(dst, key, val) { setKeyValue(dst, key, Number::New(isolate, ptr_to_double(val))); };
 
 #define setIndexValue(dst, key, val) { dst->Set(index, val); };
 #define setIndexPtr(dst, index, val) { setIndexValue(dst, key, Number::New(isolate, ptr_to_double(val))); };
 
-#define setEternalLit(lit) { es_##lit.Set(isolate, String::NewFromTwoByte(isolate, ptr_to_ptr<const wchar_t *, const uint16_t *>(L#lit), v8::String::kInternalizedString)); }
-#define getEternalLit(lit) es_##lit.Get(isolate)
+//#define setEternalLit(lit) { EternalStrings::es_##lit.Set(isolate, String::NewFromTwoByte(isolate, ptr_to_ptr<const wchar_t *, const uint16_t *>(L#lit), v8::String::kInternalizedString)); }
+#define getEternalLit(lit) EternalStrings::es_##lit.Get(isolate)
+
+#define getELitValue(src, eLit) src->Get(getEternalLit(eLit))
+#define getELitValueFromObject(src, eLit) src->ToObject()->Get(getEternalLit(eLit))
+#define getELitValueFromArgN(argN, eLit) args[argN]->ToObject()->Get(getEternalLit(eLit))
+
+#define get_args_n_Elit_as_Array(argN, eLit) Local<Array>::Cast(args[argN]->ToObject()->Get(getEternalLit(eLit)))
+#define get_args_n_Elit_as_Uint32(argN, eLit) args[argN]->ToObject()->Get(getEternalLit(eLit))->Uint32Value()
 
 #define setELitValue(dst, eLit, val) { dst->Set(getEternalLit(eLit), val); };
 #define setELitInt32(dst, eLit, val) { setELitValue(dst, eLit, Int32::New(isolate, val)); };
 #define setELitUint32(dst, eLit, val) { setELitValue(dst, eLit, Uint32::New(isolate, val)); };
 #define setELitPtr(dst, eLit, val) { setELitValue(dst, eLit, Number::New(isolate, ptr_to_double(val))); };
 
+
+namespace EternalStrings {
+#define createELit(eLit) extern v8::Eternal<v8::String> es_##eLit;
+#include "EternalStrings.h"
+#undef createELit
+}
 
 
 #include "vulkan_level_10.h"

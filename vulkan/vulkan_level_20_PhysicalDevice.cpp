@@ -2,7 +2,6 @@
 
 namespace vulkan_level_20 {
 	Persistent<Function> PhysicalDevice::constructor;
-	v8::Eternal<v8::String> es_physicalDevice;
 
 	void PhysicalDevice::Init(Isolate* isolate) {
 		Local<FunctionTemplate> tpl = FunctionTemplate::New(isolate, New);
@@ -12,7 +11,6 @@ namespace vulkan_level_20 {
 		NODE_SET_PROTOTYPE_METHOD(tpl, "getQueueFamilyProperties", getQueueFamilyProperties);
 		NODE_SET_PROTOTYPE_METHOD(tpl, "getWin32PresentationSupportKHR", getWin32PresentationSupportKHR);
 		NODE_SET_PROTOTYPE_METHOD(tpl, "getMemoryProperties", getMemoryProperties);
-		es_physicalDevice.Set(isolate, String::NewFromTwoByte(isolate, ptr_to_ptr<const wchar_t *, const uint16_t *>(L"physicalDevice"), v8::String::kInternalizedString));
 		
 		constructor.Reset(isolate, tpl->GetFunction());
 	}
@@ -49,20 +47,20 @@ namespace vulkan_level_20 {
 		Local<Object> ret{ Object::New(isolate) };;
 		Local<Array> memoryTypes{ Array::New(isolate, props.memoryTypeCount) };
 		Local<Array> memoryHeaps{ Array::New(isolate, props.memoryHeapCount) };
-		setKeyValue(ret, "memoryTypes", memoryTypes);
-		setKeyValue(ret, "memoryHeaps", memoryHeaps);
+		setELitValue(ret, memoryTypes, memoryTypes);
+		setELitValue(ret, memoryHeaps, memoryHeaps);
 
 		for (int32_t index{ 0 }; index < SafeInt<int32_t>(props.memoryTypeCount); index++) {
 			Local<Object> nProps{ Object::New(isolate) };
-			setKeyUint32(nProps, "propertyFlags", props.memoryTypes[index].propertyFlags);
-			setKeyUint32(nProps, "heapIndex", props.memoryTypes[index].heapIndex);
+			setELitUint32(nProps, propertyFlags, props.memoryTypes[index].propertyFlags);
+			setELitUint32(nProps, heapIndex, props.memoryTypes[index].heapIndex);
 			setIndexValue(memoryTypes, index, nProps);
 		}
 
 		for (int32_t index{ 0 }; index < SafeInt<int32_t>(props.memoryHeapCount); index++) {
 			Local<Object> nProps{ Object::New(isolate) };
-			setKeyValue(nProps, "size", Number::New(isolate, static_cast<double_t>(props.memoryHeaps[index].size)));
-			setKeyUint32(nProps, "flags", props.memoryHeaps[index].flags);
+			setELitValue(nProps, size, Number::New(isolate, static_cast<double_t>(props.memoryHeaps[index].size)));
+			setELitUint32(nProps, flags, props.memoryHeaps[index].flags);
 			setIndexValue(memoryHeaps, index, nProps);
 		}
 
@@ -108,15 +106,15 @@ namespace vulkan_level_20 {
 		Local<Array> aQueueFamilyProperties{ Array::New(isolate, pQueueFamilyPropertyCount) };
 		for (int32_t index{ 0 }; index < SafeInt<int32_t>(pQueueFamilyPropertyCount); index++) {
 			Local<Object> nProps{ Object::New(isolate) };
-			setKeyUint32(nProps, "queueFlags", pQueueFamilyProperties[index].queueFlags);
-			setKeyUint32(nProps, "queueCount", pQueueFamilyProperties[index].queueCount);
-			setKeyUint32(nProps, "timestampValidBits", pQueueFamilyProperties[index].timestampValidBits);
+			setELitUint32(nProps, queueFlags, pQueueFamilyProperties[index].queueFlags);
+			setELitUint32(nProps, queueCount, pQueueFamilyProperties[index].queueCount);
+			setELitUint32(nProps, timestampValidBits, pQueueFamilyProperties[index].timestampValidBits);
 
 			Local<Object> minImageTransferGranularity{ Object::New(isolate) };
-			setKeyUint32(minImageTransferGranularity, "width", pQueueFamilyProperties[index].minImageTransferGranularity.width);
-			setKeyUint32(minImageTransferGranularity, "height", pQueueFamilyProperties[index].minImageTransferGranularity.height);
-			setKeyUint32(minImageTransferGranularity, "depth", pQueueFamilyProperties[index].minImageTransferGranularity.depth);
-			setKeyValue(nProps, "minImageTransferGranularity", minImageTransferGranularity);
+			setELitUint32(minImageTransferGranularity, width, pQueueFamilyProperties[index].minImageTransferGranularity.width);
+			setELitUint32(minImageTransferGranularity, height, pQueueFamilyProperties[index].minImageTransferGranularity.height);
+			setELitUint32(minImageTransferGranularity, depth, pQueueFamilyProperties[index].minImageTransferGranularity.depth);
+			setELitValue(nProps, minImageTransferGranularity, minImageTransferGranularity);
 
 			setIndexValue(aQueueFamilyProperties, index, nProps);
 		}

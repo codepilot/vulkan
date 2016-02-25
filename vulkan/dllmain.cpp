@@ -1,6 +1,12 @@
 //#include "vulkanDll.h"
 #include "vulkan_levels.h"
 
+namespace EternalStrings {
+#define createELit(eLit) v8::Eternal<v8::String> es_##eLit;
+#include "EternalStrings.h"
+#undef createELit
+}
+
 namespace {
 
 	using v8::Object;
@@ -33,13 +39,19 @@ namespace {
 		Isolate* isolate = Isolate::GetCurrent();
 		HandleScope handle_scope(isolate);
 
+		{
+#define createELit(eLit) { EternalStrings::es_##eLit.Set(isolate, String::NewFromTwoByte(isolate, ptr_to_ptr<const wchar_t *, const uint16_t *>(L#eLit), v8::String::kInternalizedString)); }
+#include "EternalStrings.h"
+#undef createELit
+		}
+
 	#ifdef _DEBUG
 		AtExit(AtExit_DebugCallback);
 	#endif
 		Local<Object> level_10{ Object::New(isolate) };
 		Local<Object> level_20{ Object::New(isolate) };
-		setKeyValue(exports, "level_10", level_10);
-		setKeyValue(exports, "level_20", level_20);
+		setELitValue(exports, level_10, level_10);
+		setELitValue(exports, level_20, level_20);
 		vulkan_level_10::Init(level_10);
 		vulkan_level_20::Init(level_20);
 	//VulkanDll::Init(exports);
