@@ -2,6 +2,9 @@
 
 namespace vulkan_level_20 {
 	Persistent<Function> Instance::constructor;
+	v8::Eternal<v8::String> es_status;
+	v8::Eternal<v8::String> es_instance;
+	
 
 	void Instance::Init(Isolate* isolate) {
 		// Prepare constructor template
@@ -15,6 +18,12 @@ namespace vulkan_level_20 {
 		//NODE_SET_PROTOTYPE_METHOD(tpl, "getLengthReceived", wrap_getLengthReceived);
 		//NODE_SET_PROTOTYPE_METHOD(tpl, "getBuffer", wrap_getBuffer);
 		//NODE_SET_PROTOTYPE_METHOD(tpl, "getBufferReceived", wrap_getBufferReceived);
+	//es_status.Set(isolate, String::NewFromTwoByte(isolate, ptr_to_ptr<const wchar_t *, const uint16_t *>(L"status"), v8::String::kInternalizedString));
+	//es_instance.Set(isolate, String::NewFromTwoByte(isolate, ptr_to_ptr<const wchar_t *, const uint16_t *>(L"instance"), v8::String::kInternalizedString));
+
+		setEternalLit(status);
+		setEternalLit(instance);
+		
 		constructor.Reset(isolate, tpl->GetFunction());
 	}
 
@@ -61,9 +70,10 @@ namespace vulkan_level_20 {
 		info.enabledLayerCount = SafeInt<uint32_t>(vpEnabledLayerNames.size());
 
 		const auto status = vkCreateInstance(&info, nullptr, &instance);
-		setKeyInt32(args.This(), "status", status);
+		setELitInt32(args.This(), status, status);
+
 		printf("instance: %I64u (0x%I64x)\n", (int64_t)instance, (int64_t)instance);
-		setKeyPtr(args.This(), "instance", instance);
+		setELitPtr(args.This(), instance, instance);
 
 		getProcAddr(vkCreateDebugReportCallbackEXT, "vkCreateDebugReportCallbackEXT");
 		getProcAddr(vkDestroyDebugReportCallbackEXT, "vkDestroyDebugReportCallbackEXT");

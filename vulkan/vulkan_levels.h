@@ -50,6 +50,15 @@ template <typename SrcType, typename DstType> DstType ptr_to_ptr(SrcType srcPtr)
 #define setIndexValue(dst, key, val) { dst->Set(index, val); };
 #define setIndexPtr(dst, index, val) { setIndexValue(dst, key, Number::New(isolate, ptr_to_double(val))); };
 
+#define setEternalLit(lit) { es_##lit.Set(isolate, String::NewFromTwoByte(isolate, ptr_to_ptr<const wchar_t *, const uint16_t *>(L#lit), v8::String::kInternalizedString)); }
+#define getEternalLit(lit) es_##lit.Get(isolate)
+
+#define setELitValue(dst, eLit, val) { dst->Set(getEternalLit(eLit), val); };
+#define setELitInt32(dst, eLit, val) { setELitValue(dst, eLit, Int32::New(isolate, val)); };
+#define setELitUint32(dst, eLit, val) { setELitValue(dst, eLit, Uint32::New(isolate, val)); };
+#define setELitPtr(dst, eLit, val) { setELitValue(dst, eLit, Number::New(isolate, ptr_to_double(val))); };
+
+
 
 #include "vulkan_level_10.h"
 #include "vulkan_level_20.h"

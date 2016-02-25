@@ -2,6 +2,7 @@
 
 namespace vulkan_level_20 {
 	Persistent<Function> PhysicalDevice::constructor;
+	v8::Eternal<v8::String> es_physicalDevice;
 
 	void PhysicalDevice::Init(Isolate* isolate) {
 		Local<FunctionTemplate> tpl = FunctionTemplate::New(isolate, New);
@@ -11,7 +12,7 @@ namespace vulkan_level_20 {
 		NODE_SET_PROTOTYPE_METHOD(tpl, "getQueueFamilyProperties", getQueueFamilyProperties);
 		NODE_SET_PROTOTYPE_METHOD(tpl, "getWin32PresentationSupportKHR", getWin32PresentationSupportKHR);
 		NODE_SET_PROTOTYPE_METHOD(tpl, "getMemoryProperties", getMemoryProperties);
-
+		es_physicalDevice.Set(isolate, String::NewFromTwoByte(isolate, ptr_to_ptr<const wchar_t *, const uint16_t *>(L"physicalDevice"), v8::String::kInternalizedString));
 		
 		constructor.Reset(isolate, tpl->GetFunction());
 	}
@@ -34,8 +35,7 @@ namespace vulkan_level_20 {
 		Wrap(args.This());
 		instance.Reset(isolate, args[0]->ToObject());
 		physicalDevice = double_to_ptr<VkPhysicalDevice>(args[1]->NumberValue());
-		setKeyPtr(args.This(), "physicalDevice", physicalDevice);
-
+		setELitPtr(args.This(), physicalDevice, physicalDevice);
 	}
 
 	void PhysicalDevice::getMemoryProperties(const FunctionCallbackInfo<Value>& args) {
