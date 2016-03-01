@@ -47,8 +47,11 @@ template <typename SrcType, typename DstType> DstType ptr_to_ptr(SrcType srcPtr)
 //#define setKeyUint32(dst, key, val) { setKeyValue(dst, key, Uint32::New(isolate, val)); };
 //#define setKeyPtr(dst, key, val) { setKeyValue(dst, key, Number::New(isolate, ptr_to_double(val))); };
 
-#define setIndexValue(dst, key, val) { dst->Set(index, val); };
-#define setIndexPtr(dst, index, val) { setIndexValue(dst, key, Number::New(isolate, ptr_to_double(val))); };
+#define setIndexValue(dst, index, val) { dst->Set(index, val); };
+#define setIndexInt32(dst, index, val) { setIndexValue(dst, index, Int32::New(isolate, val)); };
+#define setIndexUint32(dst, index, val) { setIndexValue(dst, index, Uint32::New(isolate, val)); };
+#define setIndexFloat64(dst, index, val) { setIndexValue(dst, index, Number::New(isolate, val)); };
+#define setIndexPtr(dst, index, val) { setIndexValue(dst, index, Number::New(isolate, ptr_to_double(val))); };
 
 //#define setEternalLit(lit) { EternalStrings::es_##lit.Set(isolate, String::NewFromTwoByte(isolate, ptr_to_ptr<const wchar_t *, const uint16_t *>(L#lit), v8::String::kInternalizedString)); }
 #define getEternalLit(lit) EternalStrings::es_##lit.Get(isolate)
@@ -63,6 +66,7 @@ template <typename SrcType, typename DstType> DstType ptr_to_ptr(SrcType srcPtr)
 #define setELitValue(dst, eLit, val) { dst->Set(getEternalLit(eLit), val); };
 #define setELitInt32(dst, eLit, val) { setELitValue(dst, eLit, Int32::New(isolate, val)); };
 #define setELitUint32(dst, eLit, val) { setELitValue(dst, eLit, Uint32::New(isolate, val)); };
+#define setELitFloat64(dst, eLit, val) { setELitValue(dst, eLit, Number::New(isolate, val)); };
 #define setELitPtr(dst, eLit, val) { setELitValue(dst, eLit, Number::New(isolate, ptr_to_double(val))); };
 
 

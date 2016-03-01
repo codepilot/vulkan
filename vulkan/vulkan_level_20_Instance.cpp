@@ -3,6 +3,17 @@
 namespace vulkan_level_20 {
 	Persistent<Function> Instance::constructor;
 	
+	void Instance::physicalDevices_AccessorGetterCallback(Local<String> property, const v8::PropertyCallbackInfo<Value>& info) {
+		Isolate* isolate = info.GetIsolate();
+		HandleScope handle_scope(isolate);
+
+		Instance* instance = ObjectWrap::Unwrap<Instance>(info.Holder());
+		info.GetReturnValue().Set(instance->arrPhysicalDevices.Get(isolate));
+	}
+
+	void Instance::physicalDevices_AccessorSetterCallback(Local<String> property, Local<Value> value, const v8::PropertyCallbackInfo<void>& info) {
+
+	}
 
 	void Instance::Init(Isolate* isolate) {
 		// Prepare constructor template
@@ -10,8 +21,10 @@ namespace vulkan_level_20 {
 		tpl->SetClassName(String::NewFromUtf8(isolate, "Vulkan::Instance"));
 		tpl->InstanceTemplate()->SetInternalFieldCount(1);
 
+	//tpl->SetNativeDataProperty(getEternalLit(physicalDevices), physicalDevices_AccessorGetterCallback);
+
 		// Prototype
-		NODE_SET_PROTOTYPE_METHOD(tpl, "enumeratePhysicalDevices", enumeratePhysicalDevices);
+		//NODE_SET_PROTOTYPE_METHOD(tpl, "enumeratePhysicalDevices", enumeratePhysicalDevices);
 		//NODE_SET_PROTOTYPE_METHOD(tpl, "getBytesReceived", wrap_getBytesReceived);
 		//NODE_SET_PROTOTYPE_METHOD(tpl, "getLengthReceived", wrap_getLengthReceived);
 		//NODE_SET_PROTOTYPE_METHOD(tpl, "getBuffer", wrap_getBuffer);
@@ -94,7 +107,7 @@ namespace vulkan_level_20 {
 	//vkDebugReportMessageEXT(instance, VK_DEBUG_REPORT_INFORMATION_BIT_EXT, VK_DEBUG_REPORT_OBJECT_TYPE_UNKNOWN_EXT, 0, 0, 0, "test", "test2");
 
 	//const auto desktopSupport = vkGetPhysicalDeviceWin32PresentationSupportKHR()
-
+		/*
 		VkSurfaceKHR surface{ nullptr };
 		{
 			HMODULE hModule;
@@ -102,13 +115,45 @@ namespace vulkan_level_20 {
 			VkWin32SurfaceCreateInfoKHR info{ VK_STRUCTURE_TYPE_WIN32_SURFACE_CREATE_INFO_KHR, nullptr, 0, hModule, GetDesktopWindow()};
 			const auto status = vkCreateWin32SurfaceKHR(instance, &info, nullptr, &surface);
 		}
+		*/
+
+		uint32_t pPhysicalDeviceCount{ 0 };
+		{
+			const auto status = vkEnumeratePhysicalDevices(instance, &pPhysicalDeviceCount, nullptr);
+		}
+
+		std::vector<VkPhysicalDevice> pPhysicalDevices;
+		pPhysicalDevices.resize(pPhysicalDeviceCount, nullptr);
+
+		{
+			const auto status = vkEnumeratePhysicalDevices(instance, &pPhysicalDeviceCount, pPhysicalDevices.data());
+		}
+
+		Local<Array> aPhysicalDevices{ Array::New(isolate, pPhysicalDeviceCount) };
+		Local<Function> PhysicalDeviceConstructor = Local<Function>::New(isolate, PhysicalDevice::constructor);
+
+		for (int32_t index{ 0 }; index < SafeInt<int32_t>(pPhysicalDeviceCount); index++) {
+			std::array<Local<Value>, 2> argv{ args.This(), Number::New(isolate, ptr_to_double(pPhysicalDevices[index])) };
+			Local<Object> physicalDevice = PhysicalDeviceConstructor->NewInstance(SafeInt<int>(argv.size()), argv.data());
+			setIndexValue(aPhysicalDevices, index, physicalDevice);
+		}
+
+		arrPhysicalDevices.Reset(isolate, aPhysicalDevices);
+		arrPhysicalDevices.SetWeak<nullptr_t>(nullptr, physicalDevices_WeakCallbackInfo, v8::WeakCallbackType::kParameter);
+		args.This()->SetAccessor(getEternalLit(physicalDevices), physicalDevices_AccessorGetterCallback);
 	}
+
+	void Instance::physicalDevices_WeakCallbackInfo(const v8::WeakCallbackInfo<nullptr_t> &data) {
+
+	}
+
 	VkBool32 Instance::cb_vkDebugReportCallbackEXT(VkDebugReportFlagsEXT flags, VkDebugReportObjectTypeEXT objectType, uint64_t object, size_t location, int32_t messageCode, const char* pLayerPrefix, const char* pMessage, void* pUserData) {
 		printf("vkDebugReportCallbackEXT(%u, %u, %I64u, %I64u, %d, %s, %s, %p)\n", flags, objectType, object, location, messageCode, pLayerPrefix, pMessage, pUserData);
 		return 1;
 	}
 
 	Instance::~Instance() {
+		puts("Instance::~Instance()");
 		vkDestroyInstance(instance, nullptr);
 	}
 
@@ -120,6 +165,7 @@ namespace vulkan_level_20 {
 			// Invoked as constructor: `new MyObject(...)`
 			Instance* obj = new Instance(args);
 			args.GetReturnValue().Set(args.This());
+		//args.This()->SetAccessor(getEternalLit(physicalDevices), physicalDevices_AccessorGetterCallback);
 		}
 		else {
 			// Invoked as plain function `MyObject(...)`, turn into construct call.
@@ -131,35 +177,6 @@ namespace vulkan_level_20 {
 
 	template<typename T> T Instance::getProcAddr(T &pProc, const char* pName) {
 		return pProc = reinterpret_cast<T>(vkGetInstanceProcAddr(instance, pName));
-	}
-
-	void Instance::enumeratePhysicalDevices(const FunctionCallbackInfo<Value>& args) {
-		Isolate* isolate = args.GetIsolate();
-		HandleScope handle_scope(isolate);
-
-		Instance* instance = ObjectWrap::Unwrap<Instance>(args.Holder());
-
-		uint32_t pPhysicalDeviceCount{ 0 };
-		{
-			const auto status = vkEnumeratePhysicalDevices(instance->instance, &pPhysicalDeviceCount, nullptr);
-		}
-
-		std::vector<VkPhysicalDevice> pPhysicalDevices;
-		pPhysicalDevices.resize(pPhysicalDeviceCount, nullptr);
-
-		const auto status = vkEnumeratePhysicalDevices(instance->instance, &pPhysicalDeviceCount, pPhysicalDevices.data());
-
-		Local<Array> aPhysicalDevices{ Array::New(isolate, pPhysicalDeviceCount) };
-		Local<Function> PhysicalDeviceConstructor = Local<Function>::New(isolate, PhysicalDevice::constructor);
-
-		for (int32_t index{ 0 }; index < SafeInt<int32_t>(pPhysicalDeviceCount); index++) {
-			std::array<Local<Value>, 2> argv{ args.Holder(), Number::New(isolate, ptr_to_double(pPhysicalDevices[index])) };
-			Local<Object> physicalDevice = PhysicalDeviceConstructor->NewInstance(SafeInt<int>(argv.size()), argv.data());
-
-			setIndexValue(aPhysicalDevices, index, physicalDevice);
-		}
-
-		args.GetReturnValue().Set(aPhysicalDevices);
 	}
 
 }

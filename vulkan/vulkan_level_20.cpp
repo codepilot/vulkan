@@ -7,6 +7,7 @@ namespace vulkan_level_20 {
 
 		Instance::Init(isolate);
 		PhysicalDevice::Init(isolate);
+		Device::Init(isolate);
 
 		exports->Set(String::NewFromUtf8(isolate, "Instance"), Local<Function>::New(isolate, Instance::constructor));
 	}
