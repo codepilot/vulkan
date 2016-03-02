@@ -2,14 +2,14 @@
   "author": "Daniel Kluss <codepilot@gmail.com>",
   "name": "vulkan",
   "description": "vulkan bindings for nodejs",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "repository": {
     "type": "git",
     "url": "https://github.com/codepilot/vulkan.git"
   },
   "main": "index.js",
   "scripts": {
-    "test": "node test.js"
+    "test": "node --expose_gc test.js"
   },
   "engines": {
     "node": "~v5.7.0"

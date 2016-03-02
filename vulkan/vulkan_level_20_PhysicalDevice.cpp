@@ -8,9 +8,7 @@ namespace vulkan_level_20 {
 		tpl->SetClassName(String::NewFromUtf8(isolate, "Vulkan::PhyscalDevice"));
 		tpl->InstanceTemplate()->SetInternalFieldCount(1);
 
-		NODE_SET_PROTOTYPE_METHOD(tpl, "getQueueFamilyProperties", getQueueFamilyProperties);
 		NODE_SET_PROTOTYPE_METHOD(tpl, "getWin32PresentationSupportKHR", getWin32PresentationSupportKHR);
-		NODE_SET_PROTOTYPE_METHOD(tpl, "getMemoryProperties", getMemoryProperties);
 		NODE_SET_PROTOTYPE_METHOD(tpl, "createDevice", createDevice);
 		
 		constructor.Reset(isolate, tpl->GetFunction());
@@ -27,20 +25,14 @@ namespace vulkan_level_20 {
 		args.GetReturnValue().Set(instance);
 	};
 
-	PhysicalDevice::PhysicalDevice(const FunctionCallbackInfo<Value>& args) {
-		Isolate* isolate = args.GetIsolate();
-		HandleScope handle_scope(isolate);
-
-		Wrap(args.This());
-		instance.Reset(isolate, args[0]->ToObject());
-		physicalDevice = double_to_ptr<VkPhysicalDevice>(args[1]->NumberValue());
-		setELitPtr(args.This(), physicalDevice, physicalDevice);
+	Local<Object> PhysicalDevice::getProperties() {
+		v8::Isolate* isolate = v8::Isolate::GetCurrent();
+		v8::EscapableHandleScope handle_scope(isolate);
 
 		VkPhysicalDeviceProperties pProperties{ 0 };
 		vkGetPhysicalDeviceProperties(physicalDevice, &pProperties);
 		Local<Object> properties{ Object::New(isolate) };
 
-		setELitValue(args.This(), properties, properties);
 
 		setELitUint32(properties, apiVersion, pProperties.apiVersion);
 		setELitUint32(properties, driverVersion, pProperties.driverVersion);
@@ -113,7 +105,7 @@ namespace vulkan_level_20 {
 		setELitUint32(limits, maxComputeSharedMemorySize, pProperties.limits.maxComputeSharedMemorySize);
 
 		Local<v8::ArrayBuffer> ab_maxComputeWorkGroupCount{ v8::ArrayBuffer::New(isolate, 12) };
-		Local<v8::Uint32Array> maxComputeWorkGroupCount{ v8::Uint32Array::New(ab_maxComputeWorkGroupCount, 0, 3)};
+		Local<v8::Uint32Array> maxComputeWorkGroupCount{ v8::Uint32Array::New(ab_maxComputeWorkGroupCount, 0, 3) };
 		setELitValue(limits, maxComputeWorkGroupCount, maxComputeWorkGroupCount);
 		setIndexUint32(maxComputeWorkGroupCount, 0, pProperties.limits.maxComputeWorkGroupCount[0]);
 		setIndexUint32(maxComputeWorkGroupCount, 1, pProperties.limits.maxComputeWorkGroupCount[1]);
@@ -214,6 +206,12 @@ namespace vulkan_level_20 {
 		setELitUint32(sparseProperties, residencyAlignedMipSize, pProperties.sparseProperties.residencyAlignedMipSize);
 		setELitUint32(sparseProperties, residencyNonResidentStrict, pProperties.sparseProperties.residencyNonResidentStrict);
 
+		return handle_scope.Escape(properties);
+	}
+
+	Local<Object> PhysicalDevice::getQueueFamilyProperties() {
+		v8::Isolate* isolate = v8::Isolate::GetCurrent();
+		v8::EscapableHandleScope handle_scope(isolate);
 
 		uint32_t pQueueFamilyPropertyCount{ 0 };
 		vkGetPhysicalDeviceQueueFamilyProperties(physicalDevice, &pQueueFamilyPropertyCount, nullptr);
@@ -223,6 +221,7 @@ namespace vulkan_level_20 {
 
 		vkGetPhysicalDeviceQueueFamilyProperties(physicalDevice, &pQueueFamilyPropertyCount, pQueueFamilyProperties.data());
 		Local<Array> aQueueFamilyProperties{ Array::New(isolate, pQueueFamilyPropertyCount) };
+
 		for (int32_t index{ 0 }; index < SafeInt<int32_t>(pQueueFamilyPropertyCount); index++) {
 			Local<Object> nProps{ Object::New(isolate) };
 			setELitUint32(nProps, queueFlags, pQueueFamilyProperties[index].queueFlags);
@@ -238,13 +237,12 @@ namespace vulkan_level_20 {
 			setIndexValue(aQueueFamilyProperties, index, nProps);
 		}
 
-		setELitValue(args.This(), queueFamilyProperties, aQueueFamilyProperties);
+		return handle_scope.Escape(aQueueFamilyProperties);
+	}
 
-
-
-
-
-
+	Local<Object> PhysicalDevice::getMemoryProperties() {
+		v8::Isolate* isolate = v8::Isolate::GetCurrent();
+		v8::EscapableHandleScope handle_scope(isolate);
 
 		VkPhysicalDeviceMemoryProperties props{ 0 };
 		vkGetPhysicalDeviceMemoryProperties(physicalDevice, &props);
@@ -269,13 +267,16 @@ namespace vulkan_level_20 {
 			setIndexValue(memoryHeaps, index, nProps);
 		}
 
-		setELitValue(args.This(), memoryProperties, memoryProperties);
+		return handle_scope.Escape(memoryProperties);
+	}
 
+	Local<Object> PhysicalDevice::getFeatures() {
+		v8::Isolate* isolate = v8::Isolate::GetCurrent();
+		v8::EscapableHandleScope handle_scope(isolate);
 
 		VkPhysicalDeviceFeatures pdfeatures{ 0 };
 		vkGetPhysicalDeviceFeatures(physicalDevice, &pdfeatures);
 		Local<Object> features{ Object::New(isolate) };
-		setELitValue(args.This(), features, features);
 
 		setELitUint32(features, robustBufferAccess, pdfeatures.robustBufferAccess);
 		setELitUint32(features, fullDrawIndexUint32, pdfeatures.fullDrawIndexUint32);
@@ -332,6 +333,22 @@ namespace vulkan_level_20 {
 		setELitUint32(features, sparseResidencyAliased, pdfeatures.sparseResidencyAliased);
 		setELitUint32(features, variableMultisampleRate, pdfeatures.variableMultisampleRate);
 		setELitUint32(features, inheritedQueries, pdfeatures.inheritedQueries);
+
+		return handle_scope.Escape(features);
+	}
+
+	PhysicalDevice::PhysicalDevice(const FunctionCallbackInfo<Value>& args) {
+		Isolate* isolate = args.GetIsolate();
+		HandleScope handle_scope(isolate);
+
+		Wrap(args.This());
+		instance.Reset(isolate, args[0]->ToObject());
+		physicalDevice = double_to_ptr<VkPhysicalDevice>(args[1]->NumberValue());
+		setELitPtr(args.This(), physicalDevice, physicalDevice);
+		setELitValue(args.This(), properties, getProperties());
+		setELitValue(args.This(), queueFamilyProperties, getQueueFamilyProperties());
+		setELitValue(args.This(), memoryProperties, getMemoryProperties());
+		setELitValue(args.This(), features, getFeatures());
 	}
 
 	PhysicalDevice::~PhysicalDevice() {
@@ -394,37 +411,6 @@ namespace vulkan_level_20 {
 		args.GetReturnValue().Set(Device);
 	}
 
-	void PhysicalDevice::getMemoryProperties(const FunctionCallbackInfo<Value>& args) {
-		Isolate* isolate = args.GetIsolate();
-		HandleScope handle_scope(isolate);
-
-		auto physicalDevice = ObjectWrap::Unwrap<PhysicalDevice>(args.Holder());
-		VkPhysicalDeviceMemoryProperties props{0};
-		vkGetPhysicalDeviceMemoryProperties(physicalDevice->physicalDevice, &props);
-
-		Local<Object> ret{ Object::New(isolate) };;
-		Local<Array> memoryTypes{ Array::New(isolate, props.memoryTypeCount) };
-		Local<Array> memoryHeaps{ Array::New(isolate, props.memoryHeapCount) };
-		setELitValue(ret, memoryTypes, memoryTypes);
-		setELitValue(ret, memoryHeaps, memoryHeaps);
-
-		for (int32_t index{ 0 }; index < SafeInt<int32_t>(props.memoryTypeCount); index++) {
-			Local<Object> nProps{ Object::New(isolate) };
-			setELitUint32(nProps, propertyFlags, props.memoryTypes[index].propertyFlags);
-			setELitUint32(nProps, heapIndex, props.memoryTypes[index].heapIndex);
-			setIndexValue(memoryTypes, index, nProps);
-		}
-
-		for (int32_t index{ 0 }; index < SafeInt<int32_t>(props.memoryHeapCount); index++) {
-			Local<Object> nProps{ Object::New(isolate) };
-			setELitValue(nProps, size, Number::New(isolate, static_cast<double_t>(props.memoryHeaps[index].size)));
-			setELitUint32(nProps, flags, props.memoryHeaps[index].flags);
-			setIndexValue(memoryHeaps, index, nProps);
-		}
-
-		args.GetReturnValue().Set(ret);
-	}
-
 	void PhysicalDevice::getWin32PresentationSupportKHR(const FunctionCallbackInfo<Value>& args) {
 		Isolate* isolate = args.GetIsolate();
 		HandleScope handle_scope(isolate);
@@ -449,35 +435,4 @@ namespace vulkan_level_20 {
 			args.GetReturnValue().Set(cons->NewInstance(SafeInt<int>(argv.size()), argv.data()));
 		}
 	}
-
-	void PhysicalDevice::getQueueFamilyProperties(const FunctionCallbackInfo<Value>& args) {
-		Isolate* isolate = args.GetIsolate();
-		PhysicalDevice* physicalDevice = ObjectWrap::Unwrap<PhysicalDevice>(args.Holder());
-
-		uint32_t pQueueFamilyPropertyCount{ 0 };
-		vkGetPhysicalDeviceQueueFamilyProperties(physicalDevice->physicalDevice, &pQueueFamilyPropertyCount, nullptr);
-
-		std::vector<VkQueueFamilyProperties> pQueueFamilyProperties;
-		pQueueFamilyProperties.resize(pQueueFamilyPropertyCount);
-
-		vkGetPhysicalDeviceQueueFamilyProperties(physicalDevice->physicalDevice, &pQueueFamilyPropertyCount, pQueueFamilyProperties.data());
-		Local<Array> aQueueFamilyProperties{ Array::New(isolate, pQueueFamilyPropertyCount) };
-		for (int32_t index{ 0 }; index < SafeInt<int32_t>(pQueueFamilyPropertyCount); index++) {
-			Local<Object> nProps{ Object::New(isolate) };
-			setELitUint32(nProps, queueFlags, pQueueFamilyProperties[index].queueFlags);
-			setELitUint32(nProps, queueCount, pQueueFamilyProperties[index].queueCount);
-			setELitUint32(nProps, timestampValidBits, pQueueFamilyProperties[index].timestampValidBits);
-
-			Local<Object> minImageTransferGranularity{ Object::New(isolate) };
-			setELitUint32(minImageTransferGranularity, width, pQueueFamilyProperties[index].minImageTransferGranularity.width);
-			setELitUint32(minImageTransferGranularity, height, pQueueFamilyProperties[index].minImageTransferGranularity.height);
-			setELitUint32(minImageTransferGranularity, depth, pQueueFamilyProperties[index].minImageTransferGranularity.depth);
-			setELitValue(nProps, minImageTransferGranularity, minImageTransferGranularity);
-
-			setIndexValue(aQueueFamilyProperties, index, nProps);
-		}
-
-		args.GetReturnValue().Set(aQueueFamilyProperties);
-	}
-
 }

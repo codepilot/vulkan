@@ -22,8 +22,9 @@ namespace vulkan_level_20 {
 		tpl->InstanceTemplate()->SetInternalFieldCount(1);
 
 	//tpl->SetNativeDataProperty(getEternalLit(physicalDevices), physicalDevices_AccessorGetterCallback);
-
-		// Prototype
+		
+		NODE_SET_PROTOTYPE_METHOD(tpl, "createDebugReportCallbackEXT", createDebugReportCallbackEXT);
+			// Prototype
 		//NODE_SET_PROTOTYPE_METHOD(tpl, "enumeratePhysicalDevices", enumeratePhysicalDevices);
 		//NODE_SET_PROTOTYPE_METHOD(tpl, "getBytesReceived", wrap_getBytesReceived);
 		//NODE_SET_PROTOTYPE_METHOD(tpl, "getLengthReceived", wrap_getLengthReceived);
@@ -99,11 +100,11 @@ namespace vulkan_level_20 {
 
 		Wrap(args.This());
 
-		VkDebugReportCallbackEXT callback{ nullptr };
-		{
-			VkDebugReportCallbackCreateInfoEXT info{ VK_STRUCTURE_TYPE_DEBUG_REPORT_CREATE_INFO_EXT, nullptr, VK_DEBUG_REPORT_INFORMATION_BIT_EXT | VK_DEBUG_REPORT_WARNING_BIT_EXT | VK_DEBUG_REPORT_PERFORMANCE_WARNING_BIT_EXT | VK_DEBUG_REPORT_ERROR_BIT_EXT | VK_DEBUG_REPORT_DEBUG_BIT_EXT,  Instance::cb_vkDebugReportCallbackEXT};
-			vkCreateDebugReportCallbackEXT(instance, &info, nullptr, &callback);
-		}
+	//VkDebugReportCallbackEXT callback{ nullptr };
+	//{
+	//	VkDebugReportCallbackCreateInfoEXT info{ VK_STRUCTURE_TYPE_DEBUG_REPORT_CREATE_INFO_EXT, nullptr, VK_DEBUG_REPORT_INFORMATION_BIT_EXT | VK_DEBUG_REPORT_WARNING_BIT_EXT | VK_DEBUG_REPORT_PERFORMANCE_WARNING_BIT_EXT | VK_DEBUG_REPORT_ERROR_BIT_EXT | VK_DEBUG_REPORT_DEBUG_BIT_EXT,  Instance::cb_vkDebugReportCallbackEXT};
+	//	vkCreateDebugReportCallbackEXT(instance, &info, nullptr, &callback);
+	//}
 	//vkDebugReportMessageEXT(instance, VK_DEBUG_REPORT_INFORMATION_BIT_EXT, VK_DEBUG_REPORT_OBJECT_TYPE_UNKNOWN_EXT, 0, 0, 0, "test", "test2");
 
 	//const auto desktopSupport = vkGetPhysicalDeviceWin32PresentationSupportKHR()
@@ -147,11 +148,6 @@ namespace vulkan_level_20 {
 
 	}
 
-	VkBool32 Instance::cb_vkDebugReportCallbackEXT(VkDebugReportFlagsEXT flags, VkDebugReportObjectTypeEXT objectType, uint64_t object, size_t location, int32_t messageCode, const char* pLayerPrefix, const char* pMessage, void* pUserData) {
-		printf("vkDebugReportCallbackEXT(%u, %u, %I64u, %I64u, %d, %s, %s, %p)\n", flags, objectType, object, location, messageCode, pLayerPrefix, pMessage, pUserData);
-		return 1;
-	}
-
 	Instance::~Instance() {
 		puts("Instance::~Instance()");
 		vkDestroyInstance(instance, nullptr);
@@ -177,6 +173,28 @@ namespace vulkan_level_20 {
 
 	template<typename T> T Instance::getProcAddr(T &pProc, const char* pName) {
 		return pProc = reinterpret_cast<T>(vkGetInstanceProcAddr(instance, pName));
+	}
+
+	void Instance::createDebugReportCallbackEXT(const FunctionCallbackInfo<Value>& args) {
+		Isolate* isolate = args.GetIsolate();
+		HandleScope handle_scope(isolate);
+
+		Instance* instance = ObjectWrap::Unwrap<Instance>(args.Holder());
+
+		if (args.Length() > 0 && args[0]->IsObject()) {
+			std::array<Local<Value>, 2> argv{ args.This(), args[0] };
+			Local<Function> DebugReportCallbackEXTConstructor = Local<Function>::New(isolate, DebugReportCallbackEXT::constructor);
+			Local<Object> obj_debugReportCallbackEXT = DebugReportCallbackEXTConstructor->NewInstance(SafeInt<int>(argv.size()), argv.data());
+			args.GetReturnValue().Set(obj_debugReportCallbackEXT);
+		} else {
+			std::array<Local<Value>, 1> argv{ args.This() };
+			Local<Function> DebugReportCallbackEXTConstructor = Local<Function>::New(isolate, DebugReportCallbackEXT::constructor);
+			Local<Object> obj_debugReportCallbackEXT = DebugReportCallbackEXTConstructor->NewInstance(SafeInt<int>(argv.size()), argv.data());
+			args.GetReturnValue().Set(obj_debugReportCallbackEXT);
+		}
+
+
+
 	}
 
 }
