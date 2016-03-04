@@ -24,6 +24,7 @@ using v8::Array;
 using v8::Exception;
 using v8::FunctionCallbackInfo;
 using v8::Persistent;
+using v8::Eternal;
 
 using v8::FunctionTemplate;
 using v8::Function;
@@ -73,10 +74,42 @@ template <typename SrcType, typename DstType> DstType ptr_to_ptr(SrcType srcPtr)
 
 namespace EternalStrings {
 #define createELit(eLit) extern v8::Eternal<v8::String> es_##eLit;
-#include "EternalStrings.h"
+#include "../vulkan/EternalStrings.h"
 #undef createELit
+
 }
-
-
-#include "vulkan_level_10.h"
-#include "vulkan_level_20.h"
+#include "./Instance.h"
+#include "./Device.h"
+#include "./PipelineCache.h"
+#include "./Instance.h"
+#include "./Device.h"
+#include "./Fence.h"
+#include "./Semaphore.h"
+#include "./Event.h"
+#include "./QueryPool.h"
+#include "./Buffer.h"
+#include "./BufferView.h"
+#include "./Image.h"
+#include "./ImageView.h"
+#include "./ShaderModule.h"
+#include "./PipelineCache.h"
+#include "./GraphicsPipeline.h"
+#include "./ComputePipeline.h"
+#include "./PipelineLayout.h"
+#include "./Sampler.h"
+#include "./DescriptorSetLayout.h"
+#include "./DescriptorPool.h"
+#include "./Framebuffer.h"
+#include "./RenderPass.h"
+#include "./CommandPool.h"
+#include "./AndroidSurfaceKHR.h"
+#include "./DisplayModeKHR.h"
+#include "./DisplayPlaneSurfaceKHR.h"
+#include "./SharedSwapchainKHR.h"
+#include "./MirSurfaceKHR.h"
+#include "./SwapchainKHR.h"
+#include "./WaylandSurfaceKHR.h"
+#include "./Win32SurfaceKHR.h"
+#include "./XlibSurfaceKHR.h"
+#include "./XcbSurfaceKHR.h"
+#include "./DebugReportCallbackEXT.h"

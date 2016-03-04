@@ -1,6 +1,10 @@
 //#include "vulkanDll.h"
 #include "vulkan_levels.h"
 
+namespace vulkan_autogen {
+	void Init(Local<Object> exports);
+}
+
 namespace EternalStrings {
 #define createELit(eLit) v8::Eternal<v8::String> es_##eLit;
 #include "EternalStrings.h"
@@ -50,10 +54,15 @@ namespace {
 	#endif
 		Local<Object> level_10{ Object::New(isolate) };
 		Local<Object> level_20{ Object::New(isolate) };
+		Local<Object> vulkan_autogen{ Object::New(isolate) };
+		
 		setELitValue(exports, level_10, level_10);
 		setELitValue(exports, level_20, level_20);
+		setELitValue(exports, vulkan_autogen, vulkan_autogen);
+
 		vulkan_level_10::Init(level_10);
 		vulkan_level_20::Init(level_20);
+		vulkan_autogen::Init(vulkan_autogen);
 	//VulkanDll::Init(exports);
 	}
 	NODE_MODULE(addon, Init)

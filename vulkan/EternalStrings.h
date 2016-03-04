@@ -250,3 +250,8 @@ createELit(debugReportCallbackEXT);
 
 createELit(pfnCallback);
 createELit(pUserData);
+
+createELit(vulkan_handle);
+createELit(parent_device);
+createELit(parent_instance);
+createELit(vulkan_autogen);

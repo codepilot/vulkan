@@ -4,6 +4,15 @@ function debugCB(flags, objectType, object, location, messageCode, pLayerPrefix,
 	console.log(arguments);
 }
 
+function test_vulkan_autogen() {
+		const vulkan_autogen = require("./index.js").vulkan_autogen;
+		console.log(vulkan_autogen);
+		
+		const inst = new vulkan_autogen.Instance();
+		
+		console.log(inst);
+}
+
 function test_vulkan_level_20() {
 		const vulkan_level_20 = require("./index.js").level_20;
 
@@ -88,7 +97,9 @@ function test_vulkan_level_20() {
 		
 	}
 
-test_vulkan_level_20();
+//test_vulkan_level_20();
+test_vulkan_autogen();
+
 if(typeof global.gc === 'function') {
 	setInterval(function () { global.gc(); }, 1000);
 }
