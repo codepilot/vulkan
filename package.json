@@ -2,7 +2,7 @@
   "author": "Daniel Kluss <codepilot@gmail.com>",
   "name": "vulkan",
   "description": "vulkan bindings for nodejs",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "repository": {
     "type": "git",
     "url": "https://github.com/codepilot/vulkan.git"
